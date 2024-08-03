@@ -7,7 +7,12 @@ export default function Login() {
         password: ''
     });
 
-    const isEmailInalid = enteredValues.email != '' && !enteredValues.email.includes('@');
+    const [didEdit, setDidEdit] = useState({
+        email: false,
+        password: false
+    })
+
+    const isEmailInalid = didEdit.email && !enteredValues.email.includes('@');
 
     const handleSubmit = function (e) {
         e.preventDefault();
@@ -27,6 +32,22 @@ export default function Login() {
                 [e.target.name]: e.target.value
             }
         });
+
+        setDidEdit((prev) => {
+            return {
+                ...prev,
+                [e.target.name]: false
+            }
+        })
+    }
+
+    const handleInputBlur = function(e) {
+        setDidEdit((prev) => {
+            return {
+                ...prev,
+                [e.target.name]: true
+            }
+        })
     }
 
     return (
@@ -42,6 +63,7 @@ export default function Login() {
                         name="email"
                         value={enteredValues.email}
                         onChange={inputChange}
+                        onBlur={handleInputBlur}
                     />
                     <div className="control-error">
                         {isEmailInalid && <p className="error">Invalid email</p>}
