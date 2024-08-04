@@ -1,61 +1,43 @@
 import { useState } from "react";
 import Input from "./Input";
 
-import {isEmail, isNotEmpty, hasMinLength} from '../util/validation.js'
+import { isEmail, isNotEmpty, hasMinLength } from '../util/validation.js'
+import { useInput } from "../hooks/useInput.js";
 
 export default function Login() {
 
-    const [enteredValues, setEnteredValues] = useState({
-        email: '',
-        password: ''
-    });
+    const {
+        value: emailValue,
+        setValue: setEmailValue,
+        handleInputChange: handleEmailChange,
+        setIsEdit: setIsEmailEdit,
+        handleInputBlur: handleEmailBlur,
+        hasError: emailHasError
+    } = useInput('', (value) => isEmail(value) && isNotEmpty(value));
 
-    const [didEdit, setDidEdit] = useState({
-        email: false,
-        password: false
-    })
+    const {
+        value: passwordValue,
+        setValue: setPasswordValue,
+        setIsEdit: setIsPasswordEdit,
+        handleInputChange: handlePasswordChange,
+        handleInputBlur: handlePasswordBlur,
+        hasError: passwordHasError
+    } = useInput('', (value) => hasMinLength(value, 6) );
 
-    const isEmailInvalid = didEdit.email && 
-                            isEmail(enteredValues.email) && 
-                            !isNotEmpty(enteredValues.email);
-    const isPasswordInvalid = didEdit.password && 
-                                hasMinLength(enteredValues.password, 6) &&
-                                !isNotEmpty(enteredValues.password);
 
     const handleSubmit = function (e) {
         e.preventDefault();
 
-        console.log(enteredValues);
+        if(emailHasError || passwordHasError) {
+            return;
+        }
 
-        setEnteredValues({
-            email: '',
-            password: ''
-        });
-    }
+        console.log(emailValue, passwordValue);
+        setEmailValue('');
+        setPasswordValue('');
+        setIsEmailEdit(false);
+        setIsPasswordEdit(false);
 
-    const inputChange = function (e) {
-        setEnteredValues((prevValues) => {
-            return {
-                ...prevValues,
-                [e.target.name]: e.target.value
-            }
-        });
-
-        setDidEdit((prev) => {
-            return {
-                ...prev,
-                [e.target.name]: false
-            }
-        })
-    }
-
-    const handleInputBlur = function (e) {
-        setDidEdit((prev) => {
-            return {
-                ...prev,
-                [e.target.name]: true
-            }
-        })
     }
 
     return (
@@ -69,10 +51,10 @@ export default function Login() {
                     type="email"
                     name="email"
                     id="email"
-                    value={enteredValues.email}
-                    onChange={inputChange}
-                    onBlur={handleInputBlur}
-                    error={isEmailInvalid && "Invalid email syntex!"}
+                    value={emailValue}
+                    onChange={handleEmailChange}
+                    onBlur={handleEmailBlur}
+                    error={emailHasError && "Invalid email syntex!"}
                 />
 
                 <Input
@@ -80,10 +62,10 @@ export default function Login() {
                     type="password"
                     name="password"
                     id="password"
-                    value={enteredValues.password}
-                    onChange={inputChange}
-                    onBlur={handleInputBlur}
-                    error={isPasswordInvalid && "Password must be minimum of 6 characters!"}
+                    value={passwordValue}
+                    onChange={handlePasswordChange}
+                    onBlur={handlePasswordBlur}
+                    error={passwordHasError && "Password must be minimum of 6 characters!"}
                 />
 
             </div>
