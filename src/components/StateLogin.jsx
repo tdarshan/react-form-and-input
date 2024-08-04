@@ -1,4 +1,7 @@
 import { useState } from "react";
+import Input from "./Input";
+
+import {isEmail, isNotEmpty, hasMinLength} from '../util/validation.js'
 
 export default function Login() {
 
@@ -12,7 +15,12 @@ export default function Login() {
         password: false
     })
 
-    const isEmailInalid = didEdit.email && !enteredValues.email.includes('@');
+    const isEmailInvalid = didEdit.email && 
+                            isEmail(enteredValues.email) && 
+                            !isNotEmpty(enteredValues.email);
+    const isPasswordInvalid = didEdit.password && 
+                                hasMinLength(enteredValues.password, 6) &&
+                                !isNotEmpty(enteredValues.password);
 
     const handleSubmit = function (e) {
         e.preventDefault();
@@ -41,7 +49,7 @@ export default function Login() {
         })
     }
 
-    const handleInputBlur = function(e) {
+    const handleInputBlur = function (e) {
         setDidEdit((prev) => {
             return {
                 ...prev,
@@ -55,31 +63,29 @@ export default function Login() {
             <h2>Login</h2>
 
             <div className="control-row">
-                <div className="control no-margin">
-                    <label htmlFor="email">Email</label>
-                    <input
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={enteredValues.email}
-                        onChange={inputChange}
-                        onBlur={handleInputBlur}
-                    />
-                    <div className="control-error">
-                        {isEmailInalid && <p className="error">Invalid email</p>}
-                    </div>
-                </div>
 
-                <div className="control no-margin">
-                    <label htmlFor="password">Password</label>
-                    <input
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={enteredValues.password}
-                        onChange={inputChange}
-                    />
-                </div>
+                <Input
+                    label="Email"
+                    type="email"
+                    name="email"
+                    id="email"
+                    value={enteredValues.email}
+                    onChange={inputChange}
+                    onBlur={handleInputBlur}
+                    error={isEmailInvalid && "Invalid email syntex!"}
+                />
+
+                <Input
+                    label="Password"
+                    type="password"
+                    name="password"
+                    id="password"
+                    value={enteredValues.password}
+                    onChange={inputChange}
+                    onBlur={handleInputBlur}
+                    error={isPasswordInvalid && "Password must be minimum of 6 characters!"}
+                />
+
             </div>
 
             <p className="form-actions">
